@@ -1,0 +1,2 @@
+# ignore pycache folder no matter where it is
+__pycache__/

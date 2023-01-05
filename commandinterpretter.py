@@ -1,5 +1,7 @@
 import tkinter as tk
 import random
+import numpy as np
+
 
 render_canvas = None
 
@@ -14,23 +16,29 @@ def random_color():
         random.randint(0, 255),
     )
 
+def draw(*objects):
+    """Draws the given MathObjects."""
+    for obj in objects:
+        obj.draw()
+
+def clear(*objects):
+    """Clears the given MathObjects from the canvas."""
+    for obj in objects:
+        obj.clear()
+
 
 class MathObject:
-    """A mathematical object that can be rendered on a canvas.
+    """A mathematical object that can be rendered on a canvas."""
 
-    IMPORTANT: All derived classes must call their draw() method somewhere in their __init__() method.
-    This makes it so that the object is drawn as soon as it is created.
-    """
-
-    def __init__(self, label="unnamed"):
-        self._label = label  # label of the object (e.g. "A") on the canvas
+    def __init__(self):
+        self._label = None  # label of the object (e.g. "A") on the canvas
         global render_canvas
         self._canvas: tk.Canvas = (
             render_canvas  # the canvas the object will be drawn on
         )
         self._canvas_items = (
             []
-        )  # the items that are drawn on the canvas to represent this render object (e.g. lines, text, etc.)
+        )  # the items that are drawn on the canvas to represent this render object (e.g. lines, text, etc.), IMPORTANT: all MathObjects must put all their canvas items in this list
         self._color = random_color()  # color of the object
 
     def __del__(self):
@@ -72,11 +80,11 @@ class MathObject:
 
 
 class Vector(MathObject):
-    def __init__(self, dx, dy, label="v"):
+    def __init__(self, dx, dy, label=None):
         super().__init__()
         self._vector = (dx, dy)
         self._label = label
-        self.draw()
+        self.draw_label_at_end = False # draw the label at end (or mid-point)
 
     def draw(self):
         l = self._canvas.create_line(
@@ -84,20 +92,20 @@ class Vector(MathObject):
         )
         self._canvas_items.append(l)
 
-        text_x = self._vector[0] / 2
-        text_y = self._vector[1] / 2
-        t = self._canvas.create_text(
-            text_x, text_y, text=self._label, font=LABEL_FONT, fill=self._color
-        )
-        self._canvas_items.append(t)
+        if self._label is not None:
+            text_x = self._vector[0] if self.draw_label_at_end else self._vector[0] / 2
+            text_y = self._vector[1] if self.draw_label_at_end else self._vector[1] / 2
+            t = self._canvas.create_text(
+                text_x, text_y, text=self._label, font=LABEL_FONT, fill=self._color
+            )
+            self._canvas_items.append(t)
 
 
 class Point(MathObject):
-    def __init__(self, x, y, label="p"):
+    def __init__(self, x, y, label=None):
         super().__init__()
         self._point = (x, y)
         self._label = label
-        self.draw()
 
     def draw(self):
         o = self._canvas.create_oval(
@@ -109,62 +117,102 @@ class Point(MathObject):
         )
         self._canvas_items.append(o)
 
-        t = self._canvas.create_text(
-            self._point[0],
-            self._point[1],
-            text=self._label,
-            font=LABEL_FONT,
-            fill=self._color,
-        )
-        self._canvas_items.append(t)
+        if self._label is not None:
+            t = self._canvas.create_text(
+                self._point[0],
+                self._point[1],
+                text=self._label,
+                font=LABEL_FONT,
+                fill=self._color,
+            )
+            self._canvas_items.append(t)
 
 
 class Polyline(MathObject):
-    def __init__(self, points, label="p"):
+    def __init__(self, points, label=None):
         super().__init__()
         self._points = points
         self._label = label
-        self.draw()
 
     def draw(self):
         p = self._canvas.create_line(*self._points, fill=self._color)
         self._canvas_items.append(p)
 
-        text_x = sum([p[0] for p in self._points]) / len(self._points)
-        text_y = sum([p[1] for p in self._points]) / len(self._points)
-        t = self._canvas.create_text(
-            text_x, text_y, text=self._label, font=LABEL_FONT, fill=self._color
-        )
-        self._canvas_items.append(t)
+        if self._label is not None:
+            text_x = sum([p[0] for p in self._points]) / len(self._points)
+            text_y = sum([p[1] for p in self._points]) / len(self._points)
+            t = self._canvas.create_text(
+                text_x, text_y, text=self._label, font=LABEL_FONT, fill=self._color
+            )
+            self._canvas_items.append(t)
 
 
 class Polygon(MathObject):
-    def __init__(self, points, label="p"):
+    def __init__(self, points, label=None):
         super().__init__()
         self._points = points
         self._label = label
-        self.draw()
 
     def draw(self):
         p = self._canvas.create_polygon(*self._points, fill=self._color)
         self._canvas_items.append(p)
 
-        text_x = sum([p[0] for p in self._points]) / len(self._points)
-        text_y = sum([p[1] for p in self._points]) / len(self._points)
-        t = self._canvas.create_text(
-            text_x, text_y, text=self._label, font=LABEL_FONT, fill=self._color
-        )
-        self._canvas_items.append(t)
+        if self._label is not None:
+            text_x = sum([p[0] for p in self._points]) / len(self._points)
+            text_y = sum([p[1] for p in self._points]) / len(self._points)
+            t = self._canvas.create_text(
+                text_x, text_y, text=self._label, font=LABEL_FONT, fill=self._color
+            )
+            self._canvas_items.append(t)
 
-class Matrix(MathObject):
-    def __init__(self, matrix, label="M"):
+class LinearT(MathObject):
+    def __init__(self, matrix, label=None):
+        """A 2d linear transformation represented as a matrix. 'matrix' should be something like [[a, b], [c, d]] where a,b,c and d are some numbers."""
         super().__init__()
-        self._matrix = matrix
+        self._matrix = np.array(matrix)
         self._label = label
-        self.draw()
+        self._ihat = Vector(self.a, self.c, label="i")
+        self._jhat = Vector(self.b, self.d, label="j")
+        self._ihat.draw_label_at_end = True
+        self._jhat.draw_label_at_end = True
+
+    @property
+    def a(self):
+        return self._matrix[0][0]
+
+    @property
+    def b(self):
+        return self._matrix[0][1]
+
+    @property
+    def c(self):
+        return self._matrix[1][0]
+
+    @property
+    def d(self):
+        return self._matrix[1][1]
+
+    @property
+    def ihat(self):
+        return self._ihat
+
+    @property
+    def jhat(self):
+        return self._jhat
 
     def draw(self):
-        pass
+        # visualize the coordinate axes of the linear transformation
+        base_length = 100
+
+        ihat = self.ihat
+        ihat.color = self._color
+        ihat.draw()
+        jhat = self.jhat
+        jhat.color = self._color
+        jhat.draw()
+
+        if self._label is not None:
+            self._canvas.create_text(10,10, text=self._label, font=LABEL_FONT, fill=self._color)
 
 
 class CommandInterpretter:

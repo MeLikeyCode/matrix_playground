@@ -1,5 +1,7 @@
 import tkinter as tk
 
+FONT = ("Consolas", 11)
+
 class CodeEditor(tk.Frame):
     """Represents the GUI where the user types commands, presses buttons to run commands, etc. Basically the left side of the main gui."""
 
@@ -21,21 +23,28 @@ class CodeEditor(tk.Frame):
         pane.add(script_frame)
         pane.add(immediate_frame)
         
-        self._script_text = tk.Text(script_frame)
-        initial_text = """# Type script here. Press shift + enter to run.
+        self._script_text = tk.Text(script_frame, font=FONT, wrap=tk.NONE)
+        initial_text = """# Type script here. Press 'shift + enter' to run.
 
 a = Vector(100,100,label="a")
 b = Vector(300,400,label="b")
+
+draw(a,b)
+
+T = LinearT([[100,-100],[100,100]], label="T")
 """
         self._script_text.insert(tk.END, initial_text)
 
         self._script_text.pack(fill=tk.BOTH, expand=True)
 
-        self._immediate_text = tk.Text(immediate_frame)
+        self._immediate_text = tk.Text(immediate_frame, font=FONT, wrap=tk.NONE)
         self._immediate_text.pack(fill=tk.BOTH, expand=True)
 
-        immediate_initial_text = """# Type code to execute immediately (in the current context)
-# Press shift + enter to run."""
+        immediate_initial_text = """# Type code to execute *immediately*
+# (i.e. in the current context)
+# Press 'shift + enter' to run.
+
+a.color = 'red'"""
         self._immediate_text.insert(tk.END, immediate_initial_text)
 
         # events

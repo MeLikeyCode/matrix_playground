@@ -26,12 +26,8 @@ class CodeEditor(tk.Frame):
         self._script_text = tk.Text(script_frame, font=FONT, wrap=tk.NONE)
         initial_text = """# Type script here. Press 'shift + enter' to run.
 
-a = Vector(100,100,label="a")
-b = Vector(300,400,label="b")
-
-draw(a,b)
-
-T = LinearT([[100,-100],[100,100]], label="T")
+T = AffineT([[2,-2,3],[2,2,5]])
+draw(T)
 """
         self._script_text.insert(tk.END, initial_text)
 

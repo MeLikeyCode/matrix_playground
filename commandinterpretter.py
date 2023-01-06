@@ -7,7 +7,8 @@ render_canvas = None
 
 LABEL_FONT = ("Arial", "20", "bold")
 
-grid_size = 20 # drawing operations will be scaled by this factor
+grid_size = 20  # drawing operations will be scaled by this factor
+
 
 def random_color():
     """Returns a random color in the form of a hex string (e.g. "#ff0000")."""
@@ -17,10 +18,12 @@ def random_color():
         random.randint(0, 255),
     )
 
+
 def draw(*objects):
     """Draws the given MathObjects."""
     for obj in objects:
         obj.draw()
+
 
 def clear(*objects):
     """Clears the given MathObjects from the canvas."""
@@ -32,6 +35,7 @@ def set_grid_size(size):
     """Sets the grid size for drawing operations."""
     global grid_size
     grid_size = size
+
 
 class MathObject:
     """A mathematical object that can be rendered on a canvas."""
@@ -90,11 +94,18 @@ class Vector(MathObject):
         super().__init__()
         self._vector = (dx, dy)
         self._label = label
-        self.draw_label_at_end = False # draw the label at end (or mid-point)
+        self.draw_label_at_end = False  # draw the label at end (or mid-point)
+        self._magnitude = np.sqrt(dx**2 + dy**2)
+        self._angle = np.arctan2(dy, dx)
 
     def draw(self):
         l = self._canvas.create_line(
-            0, 0, self._vector[0] * grid_size, self._vector[1] * grid_size, arrow=tk.LAST, fill=self._color
+            0,
+            0,
+            self._vector[0] * grid_size,
+            self._vector[1] * grid_size,
+            arrow=tk.LAST,
+            fill=self._color,
         )
         self._canvas_items.append(l)
 
@@ -102,9 +113,68 @@ class Vector(MathObject):
             text_x = self._vector[0] if self.draw_label_at_end else self._vector[0] / 2
             text_y = self._vector[1] if self.draw_label_at_end else self._vector[1] / 2
             t = self._canvas.create_text(
-                text_x * grid_size, text_y * grid_size, text=self._label, font=LABEL_FONT, fill=self._color
+                text_x * grid_size,
+                text_y * grid_size,
+                text=self._label,
+                font=LABEL_FONT,
+                fill=self._color,
             )
             self._canvas_items.append(t)
+
+    @property
+    def dx(self):
+        return self._vector[0]
+
+    @property
+    def dy(self):
+        return self._vector[1]
+
+    @property
+    def magnitude(self):
+        return self._magnitude
+
+    @property
+    def angle(self):
+        return self._angle
+
+    def __add__(self, other):
+        if isinstance(other, Vector):
+            return Vector(
+                self._vector[0] + other._vector[0], self._vector[1] + other._vector[1]
+            )
+
+        if isinstance(other, Point):
+            return Point(
+                self._vector[0] + other._point[0], self._vector[1] + other._point[1]
+            )
+
+        return NotImplemented
+
+    def __neg__(self):
+        return Vector(-self._vector[0], -self._vector[1])
+
+    def __sub__(self, other):
+        return self + (-other)
+
+    def __mul__(self, other):
+        if isinstance(other, (int, float)):
+            return Vector(self._vector[0] * other, self._vector[1] * other)
+
+        return NotImplemented
+
+    def dot(self, other):
+        if not isinstance(other, Vector):
+            raise TypeError(
+                "dot product can only be computed between two vectors (i.e. 'other' must be a Vector)"
+            )
+
+        return self._vector[0] * other._vector[0] + self._vector[1] * other._vector[1]
+
+    def __eq__(self, other):
+        if not isinstance(other, Vector):
+            return False
+
+        return self._vector == other._vector
 
 
 class Point(MathObject):
@@ -126,12 +196,20 @@ class Point(MathObject):
         if self._label is not None:
             t = self._canvas.create_text(
                 self._point[0] * grid_size,
-                self._point[1] * statendard_basis_spacing,
+                self._point[1] * grid_size,
                 text=self._label,
                 font=LABEL_FONT,
                 fill=self._color,
             )
             self._canvas_items.append(t)
+
+    @property
+    def x(self):
+        return self._point[0]
+
+    @property
+    def y(self):
+        return self._point[1]
 
 
 class Polyline(MathObject):
@@ -141,14 +219,21 @@ class Polyline(MathObject):
         self._label = label
 
     def draw(self):
-        p = self._canvas.create_line(*[(p[0] * grid_size, p[1] * grid_size) for p in self._points], fill=self._color)
+        p = self._canvas.create_line(
+            *[(p[0] * grid_size, p[1] * grid_size) for p in self._points],
+            fill=self._color
+        )
         self._canvas_items.append(p)
 
         if self._label is not None:
             text_x = sum([p[0] for p in self._points]) / len(self._points)
             text_y = sum([p[1] for p in self._points]) / len(self._points)
             t = self._canvas.create_text(
-                text_x * grid_size, text_y * grid_size, text=self._label, font=LABEL_FONT, fill=self._color
+                text_x * grid_size,
+                text_y * grid_size,
+                text=self._label,
+                font=LABEL_FONT,
+                fill=self._color,
             )
             self._canvas_items.append(t)
 
@@ -160,18 +245,38 @@ class Polygon(MathObject):
         self._label = label
 
     def draw(self):
-        p = self._canvas.create_polygon(*[(p[0]*grid_size,p[1]*grid_size) for p in self._points], fill=self._color)
+        p = self._canvas.create_polygon(
+            *[(p[0] * grid_size, p[1] * grid_size) for p in self._points],
+            fill=self._color
+        )
         self._canvas_items.append(p)
 
         if self._label is not None:
             text_x = sum([p[0] for p in self._points]) / len(self._points)
             text_y = sum([p[1] for p in self._points]) / len(self._points)
             t = self._canvas.create_text(
-                text_x * grid_size, text_y *grid_size, text=self._label, font=LABEL_FONT, fill=self._color
+                text_x * grid_size,
+                text_y * grid_size,
+                text=self._label,
+                font=LABEL_FONT,
+                fill=self._color,
             )
             self._canvas_items.append(t)
 
+
 class LinearT(MathObject):
+    @staticmethod
+    def identity():
+        return LinearT([[1, 0], [0, 1]])
+    
+    @staticmethod
+    def rotation(angle):
+        return LinearT([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
+
+    @staticmethod
+    def scaling(sx, sy):
+        return LinearT([[sx, 0], [0, sy]])
+
     def __init__(self, matrix, label=None):
         """A 2d linear transformation represented as a matrix. 'matrix' should be something like [[a, b], [c, d]] where a,b,c and d are some numbers."""
         super().__init__()
@@ -181,7 +286,7 @@ class LinearT(MathObject):
         self._jhat = Vector(self.b, self.d, label="j")
         self._ihat.draw_label_at_end = True
         self._jhat.draw_label_at_end = True
-        # self._jhat.label_size = 6s
+        # self._jhat.label_size = 6
         # self._ihat.label_size = 6
 
     @property
@@ -216,26 +321,80 @@ class LinearT(MathObject):
         jx = self.b
         jy = self.d
 
-        l1 = self._canvas.create_line(0,0,ix*grid_size,iy*grid_size, fill=self._color, arrow=tk.LAST)
-        l2 = self._canvas.create_line(0,0,jx*grid_size,jy*grid_size, fill=self._color, arrow=tk.LAST)
+        l1 = self._canvas.create_line(
+            0, 0, ix * grid_size, iy * grid_size, fill=self._color, arrow=tk.LAST
+        )
+        l2 = self._canvas.create_line(
+            0, 0, jx * grid_size, jy * grid_size, fill=self._color, arrow=tk.LAST
+        )
         self._canvas_items.append(l1)
         self._canvas_items.append(l2)
 
         if self._label is not None:
-            t = self._canvas.create_text(0,0, text=self._label, font=LABEL_FONT, fill=self._color)
+            t = self._canvas.create_text(
+                0, 0, text=self._label, font=LABEL_FONT, fill=self._color
+            )
             self._canvas_items.append(t)
 
+    def __mul__(self, other):
+        # matrix vector multiplication
+        if isinstance(other, Vector):
+            return Vector(
+                self.a * other.dx + self.b * other.dy,
+                self.c * other.dx + self.d * other.dy,
+            )
+
+        return NotImplemented
+
+    def __matmul__(self, other):
+        # matrix multiplication
+        if isinstance(other, LinearT):
+            return LinearT(self._matrix @ other._matrix)
+
+        return NotImplemented
+
+    def __pow__(self, power):
+        # matrix power (including negative powers (i.e. inversion))
+        # positive power = repeated matrix multiplication
+        if isinstance(power, int):
+            return LinearT(self._matrix**power)
+
+        return NotImplemented
+
+    def __eq__(self, other):
+        if isinstance(other, LinearT):
+            return np.array_equal(self._matrix, other._matrix)
+
+        return NotImplemented
+
+
 class AffineT(MathObject):
+    @staticmethod
+    def identity():
+        return AffineT([[1, 0, 0], [0, 1, 0]])
+
+    @staticmethod
+    def translation(tx, ty):
+        return AffineT([[1, 0, tx], [0, 1, ty]])
+
+    @staticmethod
+    def rotation(angle):
+        return AffineT([[np.cos(angle), -np.sin(angle), 0], [np.sin(angle), np.cos(angle), 0]])
+
+    @staticmethod
+    def scaling(sx, sy):
+        return AffineT([[sx, 0, 0], [0, sy, 0]])
+
     def __init__(self, matrix, label=None):
         """An 2d affine transformation represented as a matrix. 'matrix' should be something like [[a, b, c], [d, e, f]] where a,b,c,d,e and f are some numbers.
-        
+
         The actual matrix that will be constructed will be:
         [a, b, c] where c and f are the tx ty components, a, e are the scale components, b d are shear components, and a b, d e are the rotation components.
         [d, e, f]
         [0, 0, 1]
         """
         super().__init__()
-        self._matrix = np.array(matrix)
+        self._matrix = np.array([matrix[0], matrix[1], [0, 0, 1]])
         self._label = label
         self._linear = LinearT(self._matrix[:2, :2])
         self._translation = Vector(self._matrix[0][2], self._matrix[1][2])
@@ -278,9 +437,12 @@ class AffineT(MathObject):
         return self._linear
 
     @property
-    def translation(self):
-        """The translation component of the affine transformation."""
-        return self._translation
+    def tx(self):
+        return self._matrix[0][2]
+
+    @property
+    def ty(self):
+        return self._matrix[1][2]
 
     def draw(self):
         # visualize the coordinate axes of the affine transformation
@@ -293,18 +455,73 @@ class AffineT(MathObject):
         jx = tx + self.b
         jy = ty + self.e
 
-        l1 = self._canvas.create_line(tx*grid_size, ty*grid_size, ix*grid_size, iy*grid_size, fill=self._color, arrow=tk.LAST)
-        l2 = self._canvas.create_line(tx*grid_size, ty*grid_size, jx*grid_size, jy*grid_size, fill=self._color, arrow=tk.LAST)
+        l1 = self._canvas.create_line(
+            tx * grid_size,
+            ty * grid_size,
+            ix * grid_size,
+            iy * grid_size,
+            fill=self._color,
+            arrow=tk.LAST,
+        )
+        l2 = self._canvas.create_line(
+            tx * grid_size,
+            ty * grid_size,
+            jx * grid_size,
+            jy * grid_size,
+            fill=self._color,
+            arrow=tk.LAST,
+        )
         self._canvas_items.append(l1)
         self._canvas_items.append(l2)
-        i1 = self._canvas.create_text(ix*grid_size, iy*grid_size, text="i", font=LABEL_FONT, fill=self._color)
-        i2 = self._canvas.create_text(jx*grid_size, jy*grid_size, text="j", font=LABEL_FONT, fill=self._color)
+        i1 = self._canvas.create_text(
+            ix * grid_size, iy * grid_size, text="i", font=LABEL_FONT, fill=self._color
+        )
+        i2 = self._canvas.create_text(
+            jx * grid_size, jy * grid_size, text="j", font=LABEL_FONT, fill=self._color
+        )
         self._canvas_items.append(i1)
         self._canvas_items.append(i2)
 
         if self._label is not None:
-            t = self._canvas.create_text(tx*grid_size,ty*grid_size, text=self._label, font=LABEL_FONT, fill=self._color)
+            t = self._canvas.create_text(
+                tx * grid_size,
+                ty * grid_size,
+                text=self._label,
+                font=LABEL_FONT,
+                fill=self._color,
+            )
             self._canvas_items.append(t)
+
+    def __mul__(self, other):
+        # matrix vector multiplication
+        if isinstance(other, Vector):
+            return Vector(
+                self.a * other.dx + self.b * other.dy + self.c,
+                self.d * other.dx + self.e * other.dy + self.f,
+            )
+
+        return NotImplemented
+
+    def __matmul__(self, other):
+        # matrix multiplication
+        if isinstance(other, AffineT):
+            return AffineT(self._matrix @ other._matrix)
+
+        return NotImplemented
+
+    def __pow__(self, power):
+        # matrix power (including negative powers (i.e. inversion))
+        # positive power = repeated matrix multiplication
+        if isinstance(power, int):
+            return AffineT(self._matrix**power)
+
+        return NotImplemented
+
+    def __eq__(self, other):
+        if isinstance(other, AffineT):
+            return np.array_equal(self._matrix, other._matrix)
+
+        return NotImplemented
 
 
 class CommandInterpretter:
@@ -345,5 +562,5 @@ class CommandInterpretter:
 
     def execute_commands_immediate(self, text):
         """Runs the given text as Python code. Does not clear the variables first."""
-        exec('from commandinterpretter import *', self._globals)
+        exec("from commandinterpretter import *", self._globals)
         exec(text, self._globals)

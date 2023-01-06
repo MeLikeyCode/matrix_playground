@@ -324,23 +324,26 @@ class LinearT(MathObject):
     def draw(self):
         # visualize the coordinate axes of the linear transformation
 
+        start = command_interpretter.initial_transform * Vector(0, 0)
         ix = self.a
         iy = self.c
+        itransformed = command_interpretter.initial_transform * Vector(ix, iy)
         jx = self.b
         jy = self.d
+        jtransformed = command_interpretter.initial_transform * Vector(jx, jy)
 
         l1 = self._canvas.create_line(
-            0, 0, ix * grid_size, iy * grid_size, fill=self._color, arrow=tk.LAST
+            start[0], start[1], itransformed[0], itransformed[1], fill=self._color, arrow=tk.LAST
         )
         l2 = self._canvas.create_line(
-            0, 0, jx * grid_size, jy * grid_size, fill=self._color, arrow=tk.LAST
+            start[0], start[1], jtransformed[0], jtransformed[1], fill=self._color, arrow=tk.LAST
         )
         self._canvas_items.append(l1)
         self._canvas_items.append(l2)
 
         if self._label is not None:
             t = self._canvas.create_text(
-                0, 0, text=self._label, font=LABEL_FONT, fill=self._color
+                start[0], start[1], text=self._label, font=LABEL_FONT, fill=self._color
             )
             self._canvas_items.append(t)
 
@@ -457,43 +460,32 @@ class AffineT(MathObject):
 
         tx = self.c
         ty = self.f
+        ttransformed = command_interpretter.initial_transform * Vector(tx, ty)
 
         ix = tx + self.a
         iy = ty + self.d
+        itransformed = command_interpretter.initial_transform * Vector(ix, iy)
         jx = tx + self.b
         jy = ty + self.e
+        jtransformed = command_interpretter.initial_transform * Vector(jx, jy)
 
-        l1 = self._canvas.create_line(
-            tx * grid_size,
-            ty * grid_size,
-            ix * grid_size,
-            iy * grid_size,
-            fill=self._color,
-            arrow=tk.LAST,
-        )
-        l2 = self._canvas.create_line(
-            tx * grid_size,
-            ty * grid_size,
-            jx * grid_size,
-            jy * grid_size,
-            fill=self._color,
-            arrow=tk.LAST,
-        )
+        l1 = self._canvas.create_line(ttransformed[0], ttransformed[1], itransformed[0], itransformed[1], fill=self._color, arrow=tk.LAST)
+        l2 = self._canvas.create_line(ttransformed[0], ttransformed[1], jtransformed[0], jtransformed[1], fill=self._color, arrow=tk.LAST)
         self._canvas_items.append(l1)
         self._canvas_items.append(l2)
         i1 = self._canvas.create_text(
-            ix * grid_size, iy * grid_size, text="i", font=LABEL_FONT, fill=self._color
+            itransformed[0], itransformed[1], text="i", font=LABEL_FONT, fill=self._color
         )
         i2 = self._canvas.create_text(
-            jx * grid_size, jy * grid_size, text="j", font=LABEL_FONT, fill=self._color
+            jtransformed[0], jtransformed[1], text="j", font=LABEL_FONT, fill=self._color
         )
         self._canvas_items.append(i1)
         self._canvas_items.append(i2)
 
         if self._label is not None:
             t = self._canvas.create_text(
-                tx * grid_size,
-                ty * grid_size,
+                ttransformed[0],
+                ttransformed[1],
                 text=self._label,
                 font=LABEL_FONT,
                 fill=self._color,
@@ -541,8 +533,8 @@ class CommandInterpretter:
         global command_interpretter
         command_interpretter = self
         self._globals = {}
-        self._grid_size = 20
-        self._grid_offset = 200
+        self._grid_size = 30
+        self._grid_offset = self._grid_size * 10
         self._initial_transform = AffineT.identity() @ AffineT.translation(self._grid_offset,self._grid_offset) @ AffineT.scaling(self._grid_size,self._grid_size)
 
         self._canvas.bind("<Configure>", lambda e: self.draw_grid())

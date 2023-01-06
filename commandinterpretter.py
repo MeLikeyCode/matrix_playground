@@ -3,11 +3,11 @@ import random
 import numpy as np
 
 
-render_canvas = None
-
 LABEL_FONT = ("Arial", "20", "bold")
 
 grid_size = 20  # drawing operations will be scaled by this factor
+
+command_interpretter = None
 
 
 def random_color():
@@ -42,9 +42,8 @@ class MathObject:
 
     def __init__(self):
         self._label = None  # label of the object (e.g. "A") on the canvas
-        global render_canvas
         self._canvas: tk.Canvas = (
-            render_canvas  # the canvas the object will be drawn on
+            command_interpretter._canvas  # the canvas the object will be drawn on
         )
         self._canvas_items = (
             []
@@ -530,17 +529,14 @@ class CommandInterpretter:
     def __init__(self, canvas: tk.Canvas):
         """'canvas' is the canvas that will be drawn on."""
         self._canvas = canvas
-        global render_canvas
-        render_canvas = self._canvas
+        global command_interpretter
+        command_interpretter = self
         self._globals = {}
-        self._grid_items = []
 
         self._canvas.bind("<Configure>", lambda e: self.draw_grid())
 
     def clear_grid(self):
-        for item in self._grid_items:
-            self._canvas.delete(item)
-        self._grid_items = []
+        self._canvas.delete("grid")
 
     def draw_grid(self):
         self.clear_grid()
@@ -549,11 +545,11 @@ class CommandInterpretter:
         height = self._canvas.winfo_height()
 
         for i in range(0, width, grid_size):
-            l = self._canvas.create_line(i, 0, i, height, fill="#ddd")
-            self._grid_items.append(l)
+            self._canvas.create_line(i, 0, i, height, fill="#ddd",tags="grid")
         for i in range(0, height, grid_size):
-            l = self._canvas.create_line(0, i, width, i, fill="#ddd")
-            self._grid_items.append(l)
+            self._canvas.create_line(0, i, width, i, fill="#ddd",tags="grid")
+
+        self._canvas.tag_lower("grid")
 
     def execute_script(self, text):
         """Runs the given text as Python code. Clears the variables first."""

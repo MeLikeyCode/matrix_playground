@@ -5,8 +5,6 @@ import numpy as np
 
 LABEL_FONT = ("Arial", "20", "bold")
 
-grid_size = 20  # drawing operations will be scaled by this factor
-
 command_interpretter = None
 
 
@@ -29,12 +27,6 @@ def clear(*objects):
     """Clears the given MathObjects from the canvas."""
     for obj in objects:
         obj.clear()
-
-
-def set_grid_size(size):
-    """Sets the grid size for drawing operations."""
-    global grid_size
-    grid_size = size
 
 
 class MathObject:
@@ -98,11 +90,13 @@ class Vector(MathObject):
         self._angle = np.arctan2(dy, dx)
 
     def draw(self):
+        pt1transformed = command_interpretter.initial_transform * Vector(0, 0)
+        pt2transformed = command_interpretter.initial_transform * Vector(self._vector[0], self._vector[1])
         l = self._canvas.create_line(
-            0,
-            0,
-            self._vector[0] * grid_size,
-            self._vector[1] * grid_size,
+            pt1transformed[0],
+            pt1transformed[1],
+            pt2transformed[0],
+            pt2transformed[1],
             arrow=tk.LAST,
             fill=self._color,
         )
@@ -111,9 +105,10 @@ class Vector(MathObject):
         if self._label is not None:
             text_x = self._vector[0] if self.draw_label_at_end else self._vector[0] / 2
             text_y = self._vector[1] if self.draw_label_at_end else self._vector[1] / 2
+            pt2transformed = command_interpretter.initial_transform * Vector(text_x, text_y)
             t = self._canvas.create_text(
-                text_x * grid_size,
-                text_y * grid_size,
+                pt2transformed[0],
+                pt2transformed[1],
                 text=self._label,
                 font=LABEL_FONT,
                 fill=self._color,
@@ -175,6 +170,9 @@ class Vector(MathObject):
 
         return self._vector == other._vector
 
+    def __getitem__(self, key):
+        return self._vector[key]
+
 
 class Point(MathObject):
     def __init__(self, x, y, label=None):
@@ -183,22 +181,24 @@ class Point(MathObject):
         self._label = label
 
     def draw(self):
+        transformed = command_interpretter.initial_transform * Vector(self._point[0], self._point[1])
         o = self._canvas.create_oval(
-            self._point[0] * grid_size - 5,
-            self._point[1] * grid_size - 5,
-            self._point[0] * grid_size + 5,
-            self._point[1] * grid_size + 5,
+            transformed[0] - 3,
+            transformed[1] - 3,
+            transformed[0] + 3,
+            transformed[1] + 3,
             fill=self._color,
+            outline=self._color,
         )
         self._canvas_items.append(o)
 
         if self._label is not None:
             t = self._canvas.create_text(
-                self._point[0] * grid_size,
-                self._point[1] * grid_size,
+                transformed[0] + 10,
+                transformed[1] + 10,
                 text=self._label,
                 font=LABEL_FONT,
-                fill=self._color,
+                fill=self._color
             )
             self._canvas_items.append(t)
 
@@ -210,26 +210,32 @@ class Point(MathObject):
     def y(self):
         return self._point[1]
 
+    def __getitem__(self, key):
+        return self._point[key]
+
 
 class Polyline(MathObject):
     def __init__(self, points, label=None):
         super().__init__()
         self._points = points
         self._label = label
+        self._points_transformed = [command_interpretter.initial_transform * Vector(p[0], p[1]) for p in points]
 
     def draw(self):
+        xys = [p for pt in self._points_transformed for p in pt]
         p = self._canvas.create_line(
-            *[(p[0] * grid_size, p[1] * grid_size) for p in self._points],
-            fill=self._color
+            *xys,
+            fill=self._color,
         )
         self._canvas_items.append(p)
 
         if self._label is not None:
             text_x = sum([p[0] for p in self._points]) / len(self._points)
             text_y = sum([p[1] for p in self._points]) / len(self._points)
+            pt_transformed = command_interpretter.initial_transform * Vector(text_x, text_y)
             t = self._canvas.create_text(
-                text_x * grid_size,
-                text_y * grid_size,
+                pt_transformed[0],
+                pt_transformed[1],
                 text=self._label,
                 font=LABEL_FONT,
                 fill=self._color,
@@ -242,10 +248,12 @@ class Polygon(MathObject):
         super().__init__()
         self._points = points
         self._label = label
+        self._points_transformed = [command_interpretter.initial_transform * Vector(p[0], p[1]) for p in points]
 
     def draw(self):
+        xys = [p for pt in self._points_transformed for p in pt]
         p = self._canvas.create_polygon(
-            *[(p[0] * grid_size, p[1] * grid_size) for p in self._points],
+            *xys,
             fill=self._color
         )
         self._canvas_items.append(p)
@@ -253,12 +261,13 @@ class Polygon(MathObject):
         if self._label is not None:
             text_x = sum([p[0] for p in self._points]) / len(self._points)
             text_y = sum([p[1] for p in self._points]) / len(self._points)
+            pt_transformed = command_interpretter.initial_transform * Vector(text_x, text_y)
             t = self._canvas.create_text(
-                text_x * grid_size,
-                text_y * grid_size,
+                pt_transformed[0],
+                pt_transformed[1],
                 text=self._label,
                 font=LABEL_FONT,
-                fill=self._color,
+                fill='#fff', # label and polygon have to be different colors
             )
             self._canvas_items.append(t)
 
@@ -532,8 +541,15 @@ class CommandInterpretter:
         global command_interpretter
         command_interpretter = self
         self._globals = {}
+        self._grid_size = 20
+        self._grid_offset = 200
+        self._initial_transform = AffineT.identity() @ AffineT.translation(self._grid_offset,self._grid_offset) @ AffineT.scaling(self._grid_size,self._grid_size)
 
         self._canvas.bind("<Configure>", lambda e: self.draw_grid())
+
+    @property
+    def initial_transform(self):
+        return self._initial_transform
 
     def clear_grid(self):
         self._canvas.delete("grid")
@@ -543,11 +559,14 @@ class CommandInterpretter:
 
         width = self._canvas.winfo_width()
         height = self._canvas.winfo_height()
+        for i in range(0, width, self._grid_size):
+            self._canvas.create_line(i, 0, i, height, fill="#ddd", tags="grid")
+        for i in range(0, height, self._grid_size):
+            self._canvas.create_line(0, i, width, i, fill="#ddd", tags="grid")
 
-        for i in range(0, width, grid_size):
-            self._canvas.create_line(i, 0, i, height, fill="#ddd",tags="grid")
-        for i in range(0, height, grid_size):
-            self._canvas.create_line(0, i, width, i, fill="#ddd",tags="grid")
+        # create the origin
+        self._canvas.create_line(self._grid_offset, 0, self._grid_offset, height, fill="#666", tags="grid")
+        self._canvas.create_line(0, self._grid_offset, width, self._grid_offset, fill="#666", tags="grid")
 
         self._canvas.tag_lower("grid")
 

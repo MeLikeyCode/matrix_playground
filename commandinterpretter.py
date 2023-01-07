@@ -9,7 +9,7 @@ command_interpretter = None
 
 
 def random_color():
-    """Returns a random color in the form of a hex string (e.g. "#ff0000")."""
+    """Returns a random color."""
     return "#%02x%02x%02x" % (
         random.randint(0, 255),
         random.randint(0, 255),
@@ -28,9 +28,17 @@ def clear(*objects):
     for obj in objects:
         obj.clear()
 
+def degrees(radians):
+    """Converts radians to degrees."""
+    return radians * 180 / np.pi
+
+def radians(degrees):
+    """Converts degrees to radians."""
+    return degrees * np.pi / 180
+
 
 class MathObject:
-    """A mathematical object that can be rendered on a canvas."""
+    """A mathematical object that can be visualized."""
 
     def __init__(self):
         self._label = None  # label of the object (e.g. "A") on the canvas
@@ -81,6 +89,8 @@ class MathObject:
 
 
 class Vector(MathObject):
+    """A 2d vector."""
+
     def __init__(self, dx, dy, label=None):
         super().__init__()
         self._vector = (dx, dy)
@@ -175,6 +185,7 @@ class Vector(MathObject):
 
 
 class Point(MathObject):
+    """A 2d point."""
     def __init__(self, x, y, label=None):
         super().__init__()
         self._point = (x, y)
@@ -215,6 +226,8 @@ class Point(MathObject):
 
 
 class Polyline(MathObject):
+    """A polyline."""
+
     def __init__(self, points, label=None):
         super().__init__()
         self._points = points
@@ -244,6 +257,20 @@ class Polyline(MathObject):
 
 
 class Polygon(MathObject):
+    """A polygon."""
+
+    @staticmethod
+    def rectangle(x,y,w,h):
+        return Polygon([(x,y), (x+w,y), (x+w,y+h), (x,y+h)])
+
+    @staticmethod
+    def square(x,y,s):
+        return Polygon.rectangle(x,y,s,s)
+
+    @staticmethod
+    def triangle(x,y,w,h):
+        return Polygon([(x,y), (x+w,y), (x+w/2,y+h)])
+
     def __init__(self, points, label=None):
         super().__init__()
         self._points = points

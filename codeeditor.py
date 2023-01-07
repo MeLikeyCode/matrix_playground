@@ -81,11 +81,14 @@ a.color = 'red'"""
         with open('commandinterpretter.py', 'r') as f:
             command_interpretter_text = f.read()
 
+        command_interpretter_num_lines = command_interpretter_text.count('\n')
+
         all_text = command_interpretter_text + '\n\n' + text
 
-        # get completions from combined text (602 is to offset the command interpretter text)
+        # get completions from combined text
         script = Script(all_text)
-        completions = script.complete(line + 602, col)
+        completions = script.complete(line + command_interpretter_num_lines + 2, col) # + 2 is for the two newlines added in all_text
+        completions = [c for c in completions if not c.name.startswith('_')]
         print(completions)
 
 

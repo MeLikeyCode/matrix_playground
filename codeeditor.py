@@ -1,5 +1,6 @@
 import tkinter as tk
 from jedi import Script
+from completions import Completions
 
 FONT = ("Consolas", 11)
 
@@ -66,6 +67,8 @@ a.color = 'red'"""
         self.bind("<<Complete>>", self.on_complete)
         self.bind("<<CompleteImmediate>>", self.on_complete_immediate)
 
+        self._completions = Completions(script_frame)
+
     def on_complete(self, event):
         """Called when the user presses ctrl + space."""
 
@@ -89,11 +92,21 @@ a.color = 'red'"""
         script = Script(all_text)
         completions = script.complete(line + command_interpretter_num_lines + 2, col) # + 2 is for the two newlines added in all_text
         completions = [c for c in completions if not c.name.startswith('_')]
-        print(completions)
 
+        # get completion names
+        completion_names = [c.name for c in completions]
+
+        # show completions
+        self._completions.set_completions(completion_names)
+
+        # show completions widget at cursor position
+        xpos, ypos, w, h = self._script_text.bbox(tk.INSERT)
+        self._completions.place_forget()
+        self._completions.place(x=xpos, y=ypos+h)
 
     def on_complete_immediate(self, event):
         """Called when the user presses ctrl + space."""
+        # TODO implement
         print("on_complete_immediate")
 
     def _on_ctrl_key_pressed(self, event):

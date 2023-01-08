@@ -7,6 +7,8 @@ class Completions(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
 
+        self._completions = []
+        self._filter = ''
         scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
         self._listbox = tk.Listbox(self, yscrollcommand=scrollbar.set)
         scrollbar.config(command=self._listbox.yview)
@@ -22,9 +24,19 @@ class Completions(tk.Frame):
 
     def set_completions(self, completions: typing.Collection[str]):
         """Set the completions to display."""
+        self._completions = completions
+        self._draw()
+
+    def _draw(self):
         self._listbox.delete(0, tk.END)
-        for completion in completions:
+        matching = [completion for completion in self._completions if completion.startswith(self._filter)]
+        for completion in matching:
             self._listbox.insert(tk.END, completion)
+
+    def set_filter(self, filter: str):
+        """Set the filter to use when displaying completions."""
+        self._filter = filter
+        self._draw()
 
 
 

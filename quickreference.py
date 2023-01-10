@@ -1,5 +1,3 @@
-from commandinterpretter import *
-
 # constructing MathObjects
 v = Vector(3,4) # 2d vector (dx,dy)
 p = Point(3,4) # 2d point (x,y)

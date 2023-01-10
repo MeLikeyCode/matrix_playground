@@ -1,6 +1,7 @@
 import tkinter as tk
 import random
 import numpy as np
+import typing
 
 
 LABEL_FONT = ("Arial", "20", "bold")
@@ -139,7 +140,10 @@ class Vector(MathObject):
 
     @property
     def angle(self):
-        return self._angle
+        return np.degrees(self._angle)
+
+    def copy(self):
+        return Vector(self._vector[0], self._vector[1])
 
     def __add__(self, other):
         if isinstance(other, Vector):
@@ -191,6 +195,9 @@ class Point(MathObject):
         self._point = (x, y)
         self._label = label
 
+    def copy(self):
+        return Point(self._point[0], self._point[1])
+
     def draw(self):
         transformed = command_interpretter.initial_transform * Vector(self._point[0], self._point[1])
         o = self._canvas.create_oval(
@@ -213,6 +220,14 @@ class Point(MathObject):
             )
             self._canvas_items.append(t)
 
+    def __add__(self, other):
+        if isinstance(other, Vector):
+            return Point(
+                self._point[0] + other._vector[0], self._point[1] + other._vector[1]
+            )
+
+        return NotImplemented
+
     @property
     def x(self):
         return self._point[0]
@@ -233,6 +248,9 @@ class Polyline(MathObject):
         self._points = points
         self._label = label
         self._points_transformed = [command_interpretter.initial_transform * Vector(p[0], p[1]) for p in points]
+
+    def copy(self):
+        return Polyline(self._points)
 
     def draw(self):
         xys = [p for pt in self._points_transformed for p in pt]
@@ -277,6 +295,9 @@ class Polygon(MathObject):
         self._label = label
         self._points_transformed = [command_interpretter.initial_transform * Vector(p[0], p[1]) for p in points]
 
+    def copy(self):
+        return Polygon(self._points)
+
     def draw(self):
         xys = [p for pt in self._points_transformed for p in pt]
         p = self._canvas.create_polygon(
@@ -306,6 +327,7 @@ class LinearT(MathObject):
     
     @staticmethod
     def rotation(angle):
+        angle = np.radians(angle)
         return LinearT([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
 
     @staticmethod
@@ -323,6 +345,9 @@ class LinearT(MathObject):
         self._jhat.draw_label_at_end = True
         # self._jhat.label_size = 6
         # self._ihat.label_size = 6
+
+    def copy(self):
+        return LinearT(self._matrix)
 
     @property
     def a(self):
@@ -375,12 +400,35 @@ class LinearT(MathObject):
             self._canvas_items.append(t)
 
     def __mul__(self, other):
-        # matrix vector multiplication
+        # matrix matrix multiplication (compose transformations)
+        if isinstance(other, LinearT):
+            return LinearT(self._matrix @ other._matrix)
+
+        # matrix tuple/list multiplication (transform point)
+        if isinstance(other, (list, tuple)):
+            return self * Vector(other[0], other[1])
+
+        # matrix vector multiplication (transform vector)
         if isinstance(other, Vector):
             return Vector(
                 self.a * other.dx + self.b * other.dy,
                 self.c * other.dx + self.d * other.dy,
             )
+
+        # matrix point multiplication (transform point)
+        if isinstance(other, Point):
+            return Point(
+                self.a * other.x + self.b * other.y,
+                self.c * other.x + self.d * other.y,
+            )
+
+        # matrix polygon multiplication (transform polygon)
+        if isinstance(other, Polygon):
+            return Polygon([self * p for p in other.points])
+
+        # matrix polyline multiplication (transform polyline)
+        if isinstance(other, Polyline):
+            return Polyline([self * p for p in other.points])
 
         return NotImplemented
 
@@ -417,6 +465,7 @@ class AffineT(MathObject):
 
     @staticmethod
     def rotation(angle):
+        angle = np.radians(angle)
         return AffineT([[np.cos(angle), -np.sin(angle), 0], [np.sin(angle), np.cos(angle), 0]])
 
     @staticmethod
@@ -436,6 +485,9 @@ class AffineT(MathObject):
         self._label = label
         self._linear = LinearT(self._matrix[:2, :2])
         self._translation = Vector(self._matrix[0][2], self._matrix[1][2])
+
+    def copy(self):
+        return AffineT(self._matrix)
 
     @property
     def a(self):
@@ -520,12 +572,35 @@ class AffineT(MathObject):
             self._canvas_items.append(t)
 
     def __mul__(self, other):
-        # matrix vector multiplication
+        # matrix matrix multiplication (compose transformations)
+        if isinstance(other, AffineT):
+            return AffineT(self._matrix @ other._matrix)
+
+        # matrix list/tuple multiplication (transform list/tuple of points)
+        if isinstance(other, (list, tuple)):
+            return self * Vector(other[0], other[1])
+
+        # matrix vector multiplication (transform vector)
         if isinstance(other, Vector):
             return Vector(
                 self.a * other.dx + self.b * other.dy + self.c,
                 self.d * other.dx + self.e * other.dy + self.f,
             )
+
+        # matrix point multiplication (transform point)
+        if isinstance(other, Point):
+            return Point(
+                self.a * other.x + self.b * other.y + self.c,
+                self.d * other.x + self.e * other.y + self.f,
+            )
+
+        # matrix polygon multiplication (transform polygon)
+        if isinstance(other, Polygon):
+            return Polygon([self * point for point in other._points])
+
+        # matrix polyline multiplication (transform polyline)
+        if isinstance(other, Polyline):
+            return Polyline([self * point for point in other._points])
 
         return NotImplemented
 

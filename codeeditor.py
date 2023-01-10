@@ -143,7 +143,6 @@ a.color = 'red'"""
         dot_location = cursor_line.rfind('.')
         if dot_location != -1:
             filter = cursor_line[dot_location+1:]
-        print("filter_text ", filter)
         self._completions.set_filter(filter)
 
     def _on_ctrl_key_pressed(self, event):

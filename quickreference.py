@@ -44,6 +44,7 @@ x, y = p.x, p.y # point components
 # matrix operations
 v = T * v # matrix vector multiplication (transform vector)
 p = T * p # matrix point multiplication (transform point)
+p = T * (3,4) # matrix tuple multiplication (transform tuple)
 T = T2 * T3 # matrix-matrix multiplication (compose transformations)
 T = T**-1 # inverse transformation
 polygon = T * polygon # transform polygon

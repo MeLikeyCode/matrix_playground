@@ -53,6 +53,7 @@ class MathObject:
 
     def __del__(self):
         self.clear()
+        # pass
 
     def clear(self):
         """Clear (erase) the object from the canvas."""

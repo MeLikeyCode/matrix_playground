@@ -11,8 +11,7 @@ If you just wanna use it, go to the releases and download the installer, you don
 If you wanna edit/build it, read on.
 
 # Dependencies
-- python 3
-- tkinter
+- python 3 (including tkinter)
 - numpy
 - jedi
 
@@ -33,7 +32,7 @@ The functionality is split into a bunch of classes. Generally 1 class per file (
 
 # Building an Installer
 - need the dependencies noted above as well as `pyinstaller` installed
-- run `create_installer.py` to create a standalone installer that you can distribute (this script uses pyinstaller first to create a standalone folder, then makes an installer from that folder)
+- run `create_installer.py` to create a standalone installer that you can distribute (this script uses pyinstaller first to create a standalone folder, then makes an installer from that folder). The installer is called `install_matrix_playground.exe` and is place at the root of the project folder.
 
 # Acknowledgements
-Thanks to python, jedi (python smart autocomplete library), vscode, and anaconda for making developing this easy.
+Thanks to python, jedi (python smart autocomplete library), NSIS, vscode, and anaconda for making developing this easy.

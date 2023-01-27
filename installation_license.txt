@@ -1,1 +1,3 @@
-I'm not responsible for anything that results as a result of you using this software. Obviously, there is no malicious intent on my part, but all software has vulnerabilities that can be exposed by certain people.
+Hello! I hope you enjoy using this free software, I had fun making it. 
+
+Please note though that I'm not responsible for anything that results as a result of you using this software. Obviously, there is no malicious intent on my part, but all software has vulnerabilities that can be exposed by certain people.

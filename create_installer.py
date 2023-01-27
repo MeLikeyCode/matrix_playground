@@ -21,13 +21,15 @@ if __name__ == "__main__":
             "pyinstaller",
             "--noconfirm",
             "--name=matrix_playground",
+            "--icon=icon.ico",
             "main.py"
         ],
         check=True,
     )
 
-    # create installer
-    subprocess.run('makensis build_installer.nsi', shell=True, check=True)
-
     # copy commandinterpretter.py to dist/matrix_playground
     shutil.copy("commandinterpretter.py", "dist/matrix_playground")
+    shutil.copy("icon.ico", "dist/matrix_playground")
+    
+    # create installer
+    subprocess.run('makensis build_installer.nsi', shell=True, check=True)

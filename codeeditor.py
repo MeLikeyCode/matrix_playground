@@ -26,6 +26,8 @@ class CodeEditor(tk.Frame):
 
         self.create_widgets()
 
+        self.get_jedi_script() # calling this once here improves speed (first instance of jedi.Script() instantiation is slow, thus we do it during startup as opposed to during first autocomplete request)
+
     def create_widgets(self):
         pane = tk.PanedWindow(self, orient=tk.VERTICAL, sashrelief=tk.RAISED,sashwidth=10,sashpad=1)
         pane.pack(fill=tk.BOTH, expand=True)

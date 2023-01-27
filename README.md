@@ -31,9 +31,9 @@ The functionality is split into a bunch of classes. Generally 1 class per file (
 - `LinearT` - represents a 2d linear transformation (i.e. does not have a translation component)
 - `AffineT` - represents a 2d affine transformation (i.e. *does* have a translation component)
 
-# Building
+# Building an Installer
 - need the dependencies noted above as well as `pyinstaller` installed
 - run `create_installer.py` to create a standalone installer that you can distribute (this script uses pyinstaller first to create a standalone folder, then makes an installer from that folder)
 
-# Acknoledgements
-Thanks to python, jedi (python smart autocomplete), vscode, and anaconda for making developing this easy.
+# Acknowledgements
+Thanks to python, jedi (python smart autocomplete library), vscode, and anaconda for making developing this easy.

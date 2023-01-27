@@ -1,6 +1,7 @@
 import tkinter as tk
 import numpy as np
 import config
+import math
 
 from vector import Vector
 from point import Point
@@ -21,14 +22,32 @@ class CommandInterpretter:
         config.command_interpretter = self
         self._globals = {}
         self._grid_size = 30
-        self._grid_offset = self._grid_size * 10
-        self._initial_transform = AffineT.identity() @ AffineT.translation(self._grid_offset,self._grid_offset) @ AffineT.scaling(self._grid_size,self._grid_size)
+        self._grid_offset = (
+            self._grid_size * 10
+        )  # IMPORTANT: must be a multiple of grid_size (maybe can remove this constraint later)
+        self._initial_transform = (
+            AffineT.identity()
+            @ AffineT.translation(self._grid_offset, self._grid_offset)
+            @ AffineT.scaling(self._grid_size, self._grid_size)
+        )
 
         self._canvas.bind("<Configure>", lambda e: self.draw_grid())
+        
+        self._canvas.bind("<ButtonPress-3>", self.scroll_start)
+        self._canvas.bind("<ButtonPress-2>", self.scroll_start)
+        self._canvas.bind("<B3-Motion>", self.scroll_move)
+        self._canvas.bind("<B2-Motion>", self.scroll_move)
 
     @property
     def initial_transform(self):
         return self._initial_transform
+
+    def scroll_start(self, event):
+        self._canvas.scan_mark(event.x, event.y)
+
+    def scroll_move(self, event):
+        self._canvas.scan_dragto(event.x, event.y, gain=1)
+        self.draw_grid()
 
     def clear_grid(self):
         self._canvas.delete("grid")
@@ -36,16 +55,24 @@ class CommandInterpretter:
     def draw_grid(self):
         self.clear_grid()
 
-        width = self._canvas.winfo_width()
-        height = self._canvas.winfo_height()
-        for i in range(0, width, self._grid_size):
-            self._canvas.create_line(i, 0, i, height, fill="#ddd", tags="grid")
-        for i in range(0, height, self._grid_size):
-            self._canvas.create_line(0, i, width, i, fill="#ddd", tags="grid")
+        # get area that camera is viewing (only draw grid in this area)
+        tl, tr, br, bl = self.camera_rect()
 
-        # create the origin
-        self._canvas.create_line(self._grid_offset, 0, self._grid_offset, height, fill="#666", tags="grid")
-        self._canvas.create_line(0, self._grid_offset, width, self._grid_offset, fill="#666", tags="grid")
+        # round to nearest grid_size
+        tl = (round(tl[0] / self._grid_size) * self._grid_size, round(tl[1] / self._grid_size) * self._grid_size)
+        tr = (round(tr[0] / self._grid_size) * self._grid_size, round(tr[1] / self._grid_size) * self._grid_size)
+        br = (round(br[0] / self._grid_size) * self._grid_size, round(br[1] / self._grid_size) * self._grid_size)
+        bl = (round(bl[0] / self._grid_size) * self._grid_size, round(bl[1] / self._grid_size) * self._grid_size)
+
+        # draw grid
+        for i in range(tl[0], tr[0], self._grid_size):
+            self._canvas.create_line(i, tl[1], i, bl[1], fill="#ddd", tags="grid")
+        for i in range(tl[1], bl[1], self._grid_size):
+            self._canvas.create_line(tl[0], i, tr[0], i, fill="#ddd", tags="grid")
+
+        # draw origin
+        self._canvas.create_line(self._grid_offset, tl[1], self._grid_offset, bl[1], fill="#666", tags="grid")
+        self._canvas.create_line(tl[0], self._grid_offset, tr[0], self._grid_offset, fill="#666", tags="grid")
 
         self._canvas.tag_lower("grid")
 
@@ -60,3 +87,18 @@ class CommandInterpretter:
         """Runs the given text as Python code. Does not clear the variables first."""
         exec("from commandinterpretter import *", self._globals)
         exec(text, self._globals)
+
+    def camera_rect(self):
+        """Returns a rectangle representing area of the canvas that the camera is currently viewing.
+
+        Returned value is (top_left, top_right, bottom_right, bottom_left), where each point is (x,y) tuple.
+        """
+        window_width = self._canvas.winfo_width()
+        window_height = self._canvas.winfo_height()
+
+        return (
+            (self._canvas.canvasx(0), self._canvas.canvasy(0)),
+            (self._canvas.canvasx(window_width), self._canvas.canvasy(0)),
+            (self._canvas.canvasx(window_width), self._canvas.canvasy(window_height)),
+            (self._canvas.canvasx(0), self._canvas.canvasy(window_height)),
+        )

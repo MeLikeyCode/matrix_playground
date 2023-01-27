@@ -129,9 +129,9 @@ class AffineT(MathObject):
     def __mul__(self, other):
         # matrix matrix multiplication (compose transformations)
         if isinstance(other, AffineT):
-            return AffineT(self._matrix @ other._matrix)
+            return self.__matmul__(other)
 
-        # matrix list/tuple multiplication (transform list/tuple of points)
+        # matrix list/tuple multiplication (transform list/tuple representation of points)
         if isinstance(other, (list, tuple)):
             return self * Vector(other[0], other[1])
 

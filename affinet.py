@@ -167,10 +167,9 @@ class AffineT(MathObject):
         return NotImplemented
 
     def __pow__(self, power):
-        # matrix power (including negative powers (i.e. inversion))
-        # positive power = repeated matrix multiplication
-        if isinstance(power, int):
-            return AffineT(self._matrix**power)
+        # invert the matrix, e.g. M**-1 (only accepts -1 as the power)
+        if isinstance(power, int) and power == -1:
+            return AffineT(np.linalg.inv(self._matrix))
 
         return NotImplemented
 

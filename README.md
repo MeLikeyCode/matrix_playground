@@ -31,8 +31,9 @@ The functionality is split into a bunch of classes. Generally 1 class per file (
 - `AffineT` - represents a 2d affine transformation (i.e. *does* have a translation component)
 
 # Building an Installer
-- need the dependencies noted above as well as `pyinstaller` installed
-- run `create_installer.py` to create a standalone installer that you can distribute (this script uses pyinstaller first to create a standalone folder, then makes an installer from that folder). The installer is called `install_matrix_playground.exe` and is place at the root of the project folder.
+- need the dependencies noted above as well as `pyinstaller` and `NSIS` installed
+- run `create_installer.py` to create a standalone installer that you can distribute
+  - This script uses pyinstaller first to create a standalone folder, then makes an installer from that folder using NSIS. The installer is called `install_matrix_playground.exe` and is place at the root of the project folder.
 
 # Acknowledgements
 Thanks to python, jedi (python smart autocomplete library), NSIS, vscode, and anaconda for making developing this easy.

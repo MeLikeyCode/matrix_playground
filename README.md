@@ -18,6 +18,9 @@ The functionality is split into a bunch of classes. Generally 1 class per file (
 - `CodeEditor` represents basically the left side of the gui (where you type code and press shift + enter to run it)
 - `CommandInterpretter` represents the thing that executes code typed in the CodeEditor (and also draws visual representations on a tkinter canvas). Basically the right side of the screen.
 - `Completions` is an autocomplete widget (a widget is a tkinter GUI element)
+- `Help` is a widget that displays a quick reference and examples (toggled by pressing f1)
+- `QuickReference` is a widget that displays the quick reference
+- `Examples` is a widget that displays example code
 - `config.py` doesn't have a class, but contains program-wide (not just module-wide) globals
 - `Gui` represents the GUI as a whole (the code editor and the command interpretter)
 - `MathObject` is the base class of all things you can create (Vectors, Points, Polygons, matrices, etc)

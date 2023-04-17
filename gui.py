@@ -17,15 +17,15 @@ class GUI(tk.Frame):
         self.pane = tk.PanedWindow(self, orient=tk.HORIZONTAL, sashrelief=tk.RAISED,sashwidth=10,sashpad=1)
         self.pane.pack(fill=tk.BOTH, expand=True)
 
-        command_gui = CodeEditor(self.pane)
+        code_editor = CodeEditor(self.pane)
         canvas = tk.Canvas(self.pane)
 
-        render_area = CommandInterpretter(canvas)
+        command_interpretter = CommandInterpretter(canvas)
 
-        self.pane.add(command_gui, width=500)
+        self.pane.add(code_editor, width=500)
         self.pane.add(canvas)
 
         # callbacks
-        command_gui.on_execute_script = lambda text: render_area.execute_script(text)
-        command_gui.on_run_immediate = lambda text: render_area.execute_commands_immediate(text)
+        code_editor.on_execute_script = lambda text: command_interpretter.execute_script(text)
+        code_editor.on_run_immediate = lambda text: command_interpretter.execute_commands_immediate(text)
 

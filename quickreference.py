@@ -56,3 +56,7 @@ clear(obj) # erase object (i.e. undraw)
 clear(obj1,obj2,obj3) # erase multiple objects in one call
 obj2 = obj.copy() # copy object
 
+# do something every frame
+def on_update(dt):
+    # called every frame, dt is time since last frame
+    v.angle += dt * 5 # rotate vector v 5 degrees per second

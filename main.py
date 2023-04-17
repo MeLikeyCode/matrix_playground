@@ -3,7 +3,7 @@ from gui import GUI
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.geometry("1024x768")
+    root.geometry("1380x720")
     root.title("Matrix Playground")
     root.iconbitmap("icon.ico")
 

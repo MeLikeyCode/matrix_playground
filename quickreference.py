@@ -1,62 +1,40 @@
-# constructing MathObjects
-v = Vector(3,4) # 2d vector (dx,dy)
-p = Point(3,4) # 2d point (x,y)
+import tkinter as tk
 
-polyline = Polyline([(0,0), (1,1), (2,2)]) # list of points
-polygon = Polygon([(0,0), (1,1), (2,2)]) # list of points
-rectangle = Polygon.rectangle(0,0,5,5) # (x,y,width,height)
-square = Polygon.square(0,0,1)
-triangle = Polygon.triangle(0,0,3,3) # (x,y,width,height)
+class QuickReference(tk.Frame):
+    """Represents the quick reference of the application."""
 
-# 2d linear transformation matrix:
-# [a b]
-# [c d]
-T = LinearT([[a,b],[c,d]]) # create manually
-T = LinearT.identity() # identity matrix
-T = LinearT.rotation(45) # rotation matrix (degrees)
-T = LinearT.scaling(2) # scaling matrix
-a, b = T.a, T.b # get matrix components
+    def __init__(self, master=None):
+        super().__init__(master)
 
-# 2d affine transformation matrix
-# [a b c]
-# [d e f]
-# [0 0 1]
-T = AffineT([[a,b,c],[d,e,f]]) # create manually
-T = AffineT.identity() # identity matrix
-T = AffineT.rotation(45) # rotation matrix (degrees)
-T = AffineT.scaling(2) # scaling matrix
-a, b = T.a, T.b # get matrix components
+        self.create_widgets()
 
-# vector operations
-v = 3*v # vector scaling
-v = v + v # vector addition
-scaler = v.dot(v2) # dot product
-dx, dy = v.dx, v.dy # vector components
-mag = v.mag # vector magnitude
-v.angle # vector angle (degrees)
+    def create_widgets(self):
+        """Creates the widgets of the quick reference."""
+        self.text = tk.Text(self, wrap=tk.NONE)
 
-# point operations
-p = p + v # point translation by vector
-x, y = p.x, p.y # point components
+        # dump contents of quickreference.txt into the text widget
+        initial_text = """\
+Quick Reference
+===============
+Press (F1) to toggle this quick reference.
 
-# matrix operations
-v = T * v # matrix vector multiplication (transform vector)
-p = T * p # matrix point multiplication (transform point)
-p = T * (3,4) # matrix tuple multiplication (transform tuple)
-T = T2 * T3 # matrix-matrix multiplication (compose transformations)
-T = T**-1 # inverse transformation
-polygon = T * polygon # transform polygon
+"""
+        self.text.insert(tk.END, initial_text)
+        with open("quickreference.txt", "r") as file:
+            self.text.insert(tk.END, file.read())
 
-# all objects (vectors, points, polygons, matrices, etc) have the following functionality
-obj.label = 'label' # set label for the object
-obj.color = 'red' # set color for the object
-draw(obj) # draw object
-draw(obj1, obj2, obj3) # draw multiple objects in one call
-clear(obj) # erase object (i.e. undraw)
-clear(obj1,obj2,obj3) # erase multiple objects in one call
-obj2 = obj.copy() # copy object
+        # create a vertical scrollbar
+        self.vscrollbar = tk.Scrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
+        self.text.config(yscrollcommand=self.vscrollbar.set)
 
-# do something every frame
-def on_update(dt):
-    # called every frame, dt is time since last frame
-    v.angle += dt * 5 # rotate vector v 5 degrees per second
+        # create a horizontal scrollbar
+        self.hscrollbar = tk.Scrollbar(self, orient=tk.HORIZONTAL, command=self.text.xview)
+        self.text.config(xscrollcommand=self.hscrollbar.set)
+
+        self.vscrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.hscrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+        self.text.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+
+        self.text.config(state=tk.DISABLED)
+        self.text.config(font=("consolas", 12))
+        self.text.config(bg="#ffffe0") # yellowish paper-colored background color

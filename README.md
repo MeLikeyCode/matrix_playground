@@ -4,7 +4,7 @@ Interactively play with/visualize matrices, vectors, points, transformations, et
 
 ![](screenshot.png)
 
-See `quickreference.py` for the cheatsheet.
+See `quickreference.txt` for the cheatsheet.
 
 If you just wanna use it, go to the [releases](https://github.com/MeLikeyCode/matrix_playground/releases) and download the installer, you don't need to read the rest of this document.
 

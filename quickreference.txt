@@ -1,0 +1,61 @@
+# constructing MathObjects
+v = Vector(3,4)     # 2d vector (dx,dy)
+p = Point(3,4)      # 2d point (x,y)
+
+polyline = Polyline([(0,0), (1,1), (2,2)])  # list of points
+polygon = Polygon([(0,0), (1,1), (2,2)])    # list of points
+rectangle = Polygon.rectangle(0,0,5,5)      # (x,y,width,height)
+square = Polygon.square(0,0,1)              # (x,y,sides)
+triangle = Polygon.triangle(0,0,3,3)        # (x,y,width,height)
+
+# 2d linear transformation matrix:
+# [a b]
+# [c d]
+T = LinearT([[a,b],[c,d]])  # create manually
+T = LinearT.identity()      # identity matrix
+T = LinearT.rotation(45)    # rotation matrix (degrees)
+T = LinearT.scaling(2)      # scaling matrix
+a, b = T.a, T.b             # get matrix components
+
+# 2d affine transformation matrix
+# [a b c]
+# [d e f]
+# [0 0 1]
+T = AffineT([[a,b,c],[d,e,f]])  # create manually
+T = AffineT.identity()          # identity matrix
+T = AffineT.rotation(45)        # rotation matrix (degrees)
+T = AffineT.scaling(2)          # scaling matrix
+a, b = T.a, T.b                 # get matrix components
+
+# vector operations
+v = 3*v             # vector scaling
+v = v + v           # vector addition
+scaler = v.dot(v2)  # dot product
+dx, dy = v.dx, v.dy # vector components
+mag = v.mag         # vector magnitude
+v.angle             # vector angle (degrees)
+
+# point operations
+p = p + v       # point translation by vector
+x, y = p.x, p.y # point components
+
+# matrix operations
+v = T * v               # matrix vector multiplication (transform vector)
+p = T * p               # matrix point multiplication (transform point)
+p = T * (3,4)           # matrix tuple multiplication (transform tuple)
+T = T2 * T3             # matrix-matrix multiplication (compose transformations)
+T = T**-1               # inverse transformation
+polygon = T * polygon   # transform polygon
+
+# all objects (vectors, points, polygons, matrices, etc) have the following functionality
+obj.label = 'label'     # set label for the object
+obj.color = 'red'       # set color for the object
+draw(obj)               # draw object
+draw(obj1, obj2, obj3)  # draw multiple objects in one call
+clear(obj)              # erase object (i.e. undraw)
+clear(obj1,obj2,obj3)   # erase multiple objects in one call
+obj2 = obj.copy()       # copy object
+
+# do something every frame (dt is time since last frame)
+def on_update(dt):
+    v.angle += dt * 5 # rotate vector v 5 degrees per second

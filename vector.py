@@ -57,6 +57,12 @@ class Vector(MathObject):
     def angle(self):
         return np.degrees(self._angle)
 
+    @angle.setter
+    def angle(self, angle):
+        self._angle = np.radians(angle)
+        self._vector = (self._magnitude * np.cos(self._angle), self._magnitude * np.sin(self._angle))
+        self.redraw()
+
     def copy(self):
         return Vector(self._vector[0], self._vector[1])
 

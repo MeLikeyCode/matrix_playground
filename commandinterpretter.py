@@ -2,6 +2,7 @@ import tkinter as tk
 import numpy as np
 import config
 import math
+import time
 
 from vector import Vector
 from point import Point
@@ -11,7 +12,6 @@ from lineart import LinearT
 from affinet import AffineT
 
 from utilities import *
-
 
 class CommandInterpretter:
     """Runs commands, keeps track of variables, allows manipulation of variables, etc."""
@@ -30,6 +30,7 @@ class CommandInterpretter:
             @ AffineT.translation(self._grid_offset, self._grid_offset)
             @ AffineT.scaling(self._grid_size, self._grid_size)
         )
+        self._fps = 30
 
         self._canvas.bind("<Configure>", lambda e: self.draw_grid())
         
@@ -37,6 +38,19 @@ class CommandInterpretter:
         self._canvas.bind("<ButtonPress-2>", self.scroll_start)
         self._canvas.bind("<B3-Motion>", self.scroll_move)
         self._canvas.bind("<B2-Motion>", self.scroll_move)
+        
+        self._time_last = time.time()
+        self._canvas.after(int(1000/self._fps),self._on_update)
+
+    def _on_update(self):
+        """Executed roughly every 1/fps seconds."""
+        time_now = time.time()
+        
+        if "on_update" in self._globals:
+            self._globals["on_update"](time_now - self._time_last)
+        
+        self._time_last = time_now
+        self._canvas.after(int(1000/self._fps),self._on_update)
 
     @property
     def initial_transform(self):

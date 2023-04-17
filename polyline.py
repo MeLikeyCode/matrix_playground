@@ -6,20 +6,34 @@ from vector import Vector
 class Polyline(MathObject):
     """A polyline."""
 
-    def __init__(self, points, label=None):
+    def __init__(self, points=None, label=None):
         super().__init__()
+        if points is None:
+            points = []
         self._points = points
         self._label = label
         self._points_transformed = [config.command_interpretter.initial_transform * Vector(p[0], p[1]) for p in points]
 
     def copy(self):
         return Polyline(self._points)
+    
+    def add(self, point):
+        """Adds a point to the polyline."""
+        self._points.append(point)
+        self._points_transformed.append(config.command_interpretter.initial_transform * Vector(point[0], point[1]))
+        self._redraw()
 
     def draw(self):
+        super().draw()
+
+        if len(self._points) < 2:
+            return
+        
         xys = [p for pt in self._points_transformed for p in pt]
         p = self._canvas.create_line(
             *xys,
             fill=self._color,
+            width=self.line_width
         )
         self._canvas_items.append(p)
 

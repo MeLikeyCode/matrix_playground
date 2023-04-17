@@ -14,6 +14,8 @@ class Point(MathObject):
         return Point(self._point[0], self._point[1])
 
     def draw(self):
+        super().draw()
+        
         transformed = config.command_interpretter.initial_transform * Vector(self._point[0], self._point[1])
         o = self._canvas.create_oval(
             transformed[0] - 3,
@@ -53,3 +55,6 @@ class Point(MathObject):
 
     def __getitem__(self, key):
         return self._point[key]
+    
+    def __str__(self) -> str:
+        return self._point.__str__()

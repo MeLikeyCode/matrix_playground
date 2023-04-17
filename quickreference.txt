@@ -1,3 +1,5 @@
+# right-click + drag to pan around
+
 # constructing MathObjects
 v = Vector(3,4)     # 2d vector (dx,dy)
 p = Point(3,4)      # 2d point (x,y)
@@ -59,3 +61,6 @@ obj2 = obj.copy()       # copy object
 # do something every frame (dt is time since last frame)
 def on_update(dt):
     v.angle += dt * 5 # rotate vector v 5 degrees per second
+
+# print stuff to console
+print(stuff) # stuff can be any object or literal

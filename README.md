@@ -2,9 +2,7 @@
 
 Interactively play with/visualize matrices, vectors, points, transformations, etc.
 
-![](screenshot.png)
-
-See `quickreference.txt` for the cheatsheet.
+![](parametric_curve.gif)
 
 If you just wanna use it, go to the [releases](https://github.com/MeLikeyCode/matrix_playground/releases) and download the installer, you don't need to read the rest of this document.
 

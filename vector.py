@@ -16,6 +16,8 @@ class Vector(MathObject):
         self._angle = np.arctan2(dy, dx)
 
     def draw(self):
+        super().draw()
+
         pt1transformed = config.command_interpretter.initial_transform * Vector(0, 0)
         pt2transformed = config.command_interpretter.initial_transform * Vector(self._vector[0], self._vector[1])
         l = self._canvas.create_line(
@@ -25,6 +27,7 @@ class Vector(MathObject):
             pt2transformed[1],
             arrow=tk.LAST,
             fill=self._color,
+            width=self.line_width
         )
         self._canvas_items.append(l)
 
@@ -52,6 +55,12 @@ class Vector(MathObject):
     @property
     def magnitude(self):
         return self._magnitude
+    
+    @magnitude.setter
+    def magnitude(self, magnitude):
+        self._magnitude = magnitude
+        self._vector = (self._magnitude * np.cos(self._angle), self._magnitude * np.sin(self._angle))
+        self._redraw()
 
     @property
     def angle(self):
@@ -61,7 +70,7 @@ class Vector(MathObject):
     def angle(self, angle):
         self._angle = np.radians(angle)
         self._vector = (self._magnitude * np.cos(self._angle), self._magnitude * np.sin(self._angle))
-        self.redraw()
+        self._redraw()
 
     def copy(self):
         return Vector(self._vector[0], self._vector[1])
@@ -107,5 +116,9 @@ class Vector(MathObject):
 
     def __getitem__(self, key):
         return self._vector[key]
+    
+    def __str__(self):
+        return self._vector.__str__()
+
 
 from point import Point

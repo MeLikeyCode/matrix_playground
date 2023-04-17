@@ -1,0 +1,101 @@
+# apply a rotation affine transformation to a point
+# =================================================
+p = Point(6,0,label='p')
+T = AffineT.rotation(45)
+p2 = T * p
+p2.label = 'p2'
+
+draw(p,p2,T)
+
+# visualize vector addition
+# =========================
+v = Vector(6,0,label='v')
+v2 = Vector(0,3,label='v2')
+v3 = v + v2
+v3.label = 'sum'
+
+draw(v,v2,v3)
+
+# visualize dot product
+# =====================
+v = Vector(1,1)
+v.magnitude = 5
+v.angle = 0
+
+v2 = Vector(1,1)
+v2.magnitude = 5
+v2.angle = 0
+
+def on_update(dt):
+  v2.angle += dt * 20 # turn 20 degrees per second
+  dot = int(v.dot(v2)) # dot product between v and v2 (rounded to an int)
+  v2.label = str(dot)
+
+draw(v,v2)
+
+# visualize mapping between coordinate systems
+# ============================================
+
+# new space to original space
+newspace = AffineT.translation(6,4) * AffineT.rotation(45)
+p = Point(1,1)
+to_original_space = newspace * p
+to_original_space.label = '(1,1) from newspace to original'
+print(to_original_space)
+
+# original space to new space
+T = newspace**-1
+to_new_space = T * to_original_space
+to_new_space.label = 'back to newspace'
+print(to_new_space)
+
+draw(newspace,to_original_space,to_new_space)
+
+# draw a parametrized curve (circle)
+# ==================================
+v = Vector(1,1)
+v.magnitude = 5
+t = 0
+h = v.magnitude
+
+polyline = Polyline()
+def on_update(dt):
+  global t
+
+  v.angle = t
+
+  theta = radians(t)
+  x = h * math.cos(theta)  
+  y = h * math.sin(theta)
+  polyline.add((x,y))
+  
+  t += 10 * dt # increment t 10 per second
+
+draw(v,polyline)
+
+# draw a flower using parametrized curves
+# =======================================
+v = Vector(1,1)
+v.magnitude = 5
+t = 0
+h = v.magnitude
+
+polyline = Polyline()
+polyline.color = 'purple'
+def on_update(dt):
+  global t
+  global h
+
+  h = math.sin(0.1*t) * 5 + 2
+
+  theta = radians(t)
+  x = h * math.cos(theta)  
+  y = h * math.sin(theta)
+  polyline.add((x,y))
+
+  v.angle = t
+  v.magnitude = h
+  
+  t += 30 * dt # increment t 30 per second
+
+draw(v,polyline)

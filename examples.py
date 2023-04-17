@@ -1,7 +1,7 @@
 import tkinter as tk
 
-class QuickReference(tk.Frame):
-    """Represents the quick reference of the application."""
+class Examples(tk.Frame):
+    """Widget that displays examples.txt."""
 
     def __init__(self, master=None):
         super().__init__(master)
@@ -9,19 +9,18 @@ class QuickReference(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
-        """Creates the widgets of the quick reference."""
+        """Creates the widgets of the examples pane."""
+
         self.text = tk.Text(self, wrap=tk.NONE)
 
-        # dump contents of quickreference.txt into the text widget
         initial_text = """\
-Quick Reference
-===============
-Press (F1) to toggle this help pane.
+Examples
+========
 
 """
         self.text.insert(tk.END, initial_text)
-        with open("quickreference.txt", "r") as file:
-            self.text.insert(tk.END, file.read())
+        with open("examples.txt", "r") as f:
+            self.text.insert(tk.END, f.read())
 
         # create a vertical scrollbar
         self.vscrollbar = tk.Scrollbar(self, orient=tk.VERTICAL, command=self.text.yview)

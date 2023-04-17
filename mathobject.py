@@ -15,6 +15,8 @@ class MathObject:
             []
         )  # the items that are drawn on the canvas to represent this render object (e.g. lines, text, etc.), IMPORTANT: all MathObjects must put all their canvas items in this list
         self._color = random_color()  # color of the object
+        self._drawn = False # whether a draw() call has been made for this object
+        self._line_width = 2 # width of lines drawn for this object
 
 
     def clear(self):
@@ -23,15 +25,19 @@ class MathObject:
         for item in self._canvas_items:
             self._canvas.delete(item)
         self._canvas_items = []
+        self._drawn = False
 
     def draw(self):
-        """Draws the object on the canvas."""
-        raise NotImplementedError()  # implemented in subclasses (add items to self._canvas_items)
+        """Draws the object on the canvas. 
+        
+        Must be implemented by subclasses, and subclasses must call super().draw() at the start of their implementation."""
+        self._drawn = True
 
-    def redraw(self):
-        """Clears then re-draws."""
-        self.clear()
-        self.draw()
+    def _redraw(self):
+        """Clears then re-draws the object."""
+        if self._drawn:
+            self.clear()
+            self.draw()
 
     @property
     def label(self):
@@ -40,7 +46,7 @@ class MathObject:
     @label.setter
     def label(self, value):
         self._label = value
-        self.redraw()
+        self._redraw()
 
     @property
     def color(self):
@@ -49,4 +55,13 @@ class MathObject:
     @color.setter
     def color(self, value):
         self._color = value
-        self.redraw()
+        self._redraw()
+
+    @property
+    def line_width(self):
+        return self._line_width
+    
+    @line_width.setter
+    def line_width(self, value):
+        self._line_width = value
+        self._redraw()

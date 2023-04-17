@@ -90,6 +90,8 @@ class AffineT(MathObject):
         return self._matrix[1][2]
 
     def draw(self):
+        super().draw()
+        
         # visualize the coordinate axes of the affine transformation
 
         tx = self.c
@@ -103,8 +105,8 @@ class AffineT(MathObject):
         jy = ty + self.e
         jtransformed = config.command_interpretter.initial_transform * Vector(jx, jy)
 
-        l1 = self._canvas.create_line(ttransformed[0], ttransformed[1], itransformed[0], itransformed[1], fill=self._color, arrow=tk.LAST)
-        l2 = self._canvas.create_line(ttransformed[0], ttransformed[1], jtransformed[0], jtransformed[1], fill=self._color, arrow=tk.LAST)
+        l1 = self._canvas.create_line(ttransformed[0], ttransformed[1], itransformed[0], itransformed[1], fill=self._color, arrow=tk.LAST,width=self.line_width)
+        l2 = self._canvas.create_line(ttransformed[0], ttransformed[1], jtransformed[0], jtransformed[1], fill=self._color, arrow=tk.LAST,width=self.line_width)
         self._canvas_items.append(l1)
         self._canvas_items.append(l2)
         i1 = self._canvas.create_text(

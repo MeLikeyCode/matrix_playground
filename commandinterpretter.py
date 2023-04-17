@@ -46,11 +46,14 @@ class CommandInterpretter:
         """Executed roughly every 1/fps seconds."""
         time_now = time.time()
         
-        if "on_update" in self._globals:
-            self._globals["on_update"](time_now - self._time_last)
-        
-        self._time_last = time_now
-        self._canvas.after(int(1000/self._fps),self._on_update)
+        try:
+            if "on_update" in self._globals:
+                self._globals["on_update"](time_now - self._time_last)
+        except Exception as e:
+            print("Error in on_update():",e)
+        finally:
+            self._time_last = time_now
+            self._canvas.after(int(1000/self._fps),self._on_update)
 
     @property
     def initial_transform(self):
@@ -92,7 +95,7 @@ class CommandInterpretter:
 
     def execute_script(self, text):
         """Runs the given text as Python code. Clears the variables first."""
-        self._globals = {}
+        self._globals.clear()
         self._canvas.delete(tk.ALL)
         self.draw_grid()
         self.execute_commands_immediate(text)

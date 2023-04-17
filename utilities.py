@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 def degrees(radians):
     """Converts radians to degrees."""

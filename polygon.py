@@ -28,6 +28,8 @@ class Polygon(MathObject):
         return Polygon(self._points)
 
     def draw(self):
+        super().draw()
+        
         xys = [p for pt in self._points_transformed for p in pt]
         p = self._canvas.create_polygon(
             *xys,

@@ -14,6 +14,7 @@ class CodeEditor(tk.Frame):
         self._shift_button_pressed = False
         self._shift_button_pressed_immediate = False
         self._ctrl_button_pressed = False
+        self._ctrl_button_pressed_immediate = False
         self._shift_button_pressed_immediate = False
         self._jedi_script_cache = {} # cache jedi scripts so we don't have to re-parse the script every time the user presses a key
         self._jedi_script_cache_size = 100 

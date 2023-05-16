@@ -14,12 +14,16 @@ class Vector(MathObject):
         self.draw_label_at_end = False  # draw the label at end (or mid-point)
         self._magnitude = np.sqrt(dx**2 + dy**2)
         self._angle = np.arctan2(dy, dx)
+        self.position = (0,0) # position of the vector's tail
 
     def draw(self):
         super().draw()
 
-        pt1transformed = config.command_interpretter.initial_transform * Vector(0, 0)
-        pt2transformed = config.command_interpretter.initial_transform * Vector(self._vector[0], self._vector[1])
+        from affinet import AffineT # import here to avoid circular import
+
+        offsetT = AffineT.translation(self.position[0],self.position[1])
+        pt1transformed = config.command_interpretter.initial_transform * offsetT * Vector(0, 0)
+        pt2transformed = config.command_interpretter.initial_transform * offsetT * Vector(self._vector[0], self._vector[1])
         l = self._canvas.create_line(
             pt1transformed[0],
             pt1transformed[1],
@@ -73,7 +77,9 @@ class Vector(MathObject):
         self._redraw()
 
     def copy(self):
-        return Vector(self._vector[0], self._vector[1])
+        newv = Vector(self._vector[0], self._vector[1])
+        newv.position = self.position
+        return newv
 
     def __add__(self, other):
         if isinstance(other, Vector):

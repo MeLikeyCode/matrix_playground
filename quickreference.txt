@@ -36,6 +36,7 @@ scaler = v.dot(v2)  # dot product
 dx, dy = v.dx, v.dy # vector components
 mag = v.mag         # vector magnitude
 v.angle             # vector angle (degrees)
+v.position          # position of the tail
 
 # point operations
 p = p + v       # point translation by vector

@@ -21,7 +21,7 @@ class Polyline(MathObject):
         """Adds a point to the polyline."""
         self._points.append(point)
         self._points_transformed.append(config.command_interpretter.initial_transform * Vector(point[0], point[1]))
-        self._redraw()
+        self.redraw()
 
     def draw(self):
         super().draw()

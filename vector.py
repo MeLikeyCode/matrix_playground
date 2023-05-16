@@ -64,7 +64,7 @@ class Vector(MathObject):
     def magnitude(self, magnitude):
         self._magnitude = magnitude
         self._vector = (self._magnitude * np.cos(self._angle), self._magnitude * np.sin(self._angle))
-        self._redraw()
+        self.redraw()
 
     @property
     def angle(self):
@@ -74,7 +74,7 @@ class Vector(MathObject):
     def angle(self, angle):
         self._angle = np.radians(angle)
         self._vector = (self._magnitude * np.cos(self._angle), self._magnitude * np.sin(self._angle))
-        self._redraw()
+        self.redraw()
 
     def copy(self):
         newv = Vector(self._vector[0], self._vector[1])

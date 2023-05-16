@@ -17,7 +17,7 @@ class MathObject:
         self._color = random_color()  # color of the object
         self._drawn = False # whether a draw() call has been made for this object
         self._line_width = 2 # width of lines drawn for this object
-
+        config.command_interpretter.math_objects.append(self)
 
     def clear(self):
         """Clear (erase) the object from the canvas."""
@@ -33,7 +33,7 @@ class MathObject:
         Must be implemented by subclasses, and subclasses must call super().draw() at the start of their implementation."""
         self._drawn = True
 
-    def _redraw(self):
+    def redraw(self):
         """Clears then re-draws the object."""
         if self._drawn:
             self.clear()
@@ -46,7 +46,7 @@ class MathObject:
     @label.setter
     def label(self, value):
         self._label = value
-        self._redraw()
+        self.redraw()
 
     @property
     def color(self):
@@ -55,7 +55,7 @@ class MathObject:
     @color.setter
     def color(self, value):
         self._color = value
-        self._redraw()
+        self.redraw()
 
     @property
     def line_width(self):
@@ -64,4 +64,4 @@ class MathObject:
     @line_width.setter
     def line_width(self, value):
         self._line_width = value
-        self._redraw()
+        self.redraw()

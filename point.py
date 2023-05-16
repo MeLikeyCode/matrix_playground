@@ -44,6 +44,14 @@ class Point(MathObject):
             )
 
         return NotImplemented
+    
+    def __sub__(self, other):
+        if isinstance(other, Point):
+            v = Vector(self._point[0] - other._point[0], self._point[1] - other._point[1])
+            v.position = other._point
+            return v
+
+        return NotImplemented
 
     @property
     def x(self):

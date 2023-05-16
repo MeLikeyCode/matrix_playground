@@ -129,6 +129,7 @@ class CommandInterpretter:
 
     def execute_script(self, text):
         """Runs the given text as Python code. Clears the variables first."""
+        self.math_objects.clear()
         self._globals.clear()
         self._canvas.delete(tk.ALL)
         self.draw_grid()

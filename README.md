@@ -37,4 +37,4 @@ The functionality is split into a bunch of classes. Generally 1 class per file (
   - This script uses pyinstaller first to create a standalone folder, then makes an installer from that folder using NSIS. The installer is called `install_matrix_playground.exe` and is place at the root of the project folder.
 
 # Acknowledgements
-Thanks to python, jedi (python smart autocomplete library), NSIS, vscode, and anaconda for making developing this easy.
+Thanks to python, jedi (python smart autocomplete library), NSIS, and vscode for making developing this easy.

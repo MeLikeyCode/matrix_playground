@@ -7,6 +7,18 @@ import tkinter as tk
 class Vector(MathObject):
     """A 2d vector."""
 
+    @staticmethod
+    def from_angle_and_magnitude(angle, magnitude):
+        """Create a vector from an angle and magnitude.
+        
+        The angle is in degrees.
+        """
+        
+        angle = np.radians(angle)
+        dx = magnitude * np.cos(angle)
+        dy = magnitude * np.sin(angle)
+        return Vector(dx, dy)
+
     def __init__(self, dx, dy, label=None):
         super().__init__()
         self._vector = (dx, dy)

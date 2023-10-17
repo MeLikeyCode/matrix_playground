@@ -12,7 +12,7 @@ class Polyline(MathObject):
             points = []
         self._points = points
         self._label = label
-        self._points_transformed = [config.command_interpretter.initial_transform * Vector(p[0], p[1]) for p in points]
+        self._points_transformed = [config.command_interpretter.initial_transform * Vector(p[0], p[1]) for p in self._points]
 
     def copy(self):
         return Polyline(self._points)
@@ -25,6 +25,8 @@ class Polyline(MathObject):
 
     def draw(self):
         super().draw()
+
+        self._points_transformed = [config.command_interpretter.initial_transform * Vector(p[0], p[1]) for p in self._points]
 
         if len(self._points) < 2:
             return

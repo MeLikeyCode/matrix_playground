@@ -32,6 +32,7 @@ class CommandInterpretter:
             @ AffineT.scaling(self._grid_size, self._grid_size)
         )
         self._fps = 30
+        self._show_grid = True
 
         self._canvas.bind("<Configure>", lambda e: self.draw_grid())
         
@@ -43,6 +44,18 @@ class CommandInterpretter:
         
         self._time_last = time.time()
         self._canvas.after(int(1000/self._fps),self._on_update)
+
+    @property
+    def show_grid(self):
+        return self._show_grid
+    
+    @show_grid.setter
+    def show_grid(self, value):
+        self._show_grid = value
+        if value:
+            self.draw_grid()
+        else:
+            self.clear_grid()
 
     @property
     def grid_size(self):
@@ -104,6 +117,9 @@ class CommandInterpretter:
             obj.redraw()
 
     def draw_grid(self):
+        if not self._show_grid:
+            return
+        
         self.clear_grid()
 
         # get area that camera is viewing (only draw grid in this area)
@@ -129,10 +145,16 @@ class CommandInterpretter:
 
     def execute_script(self, text):
         """Runs the given text as Python code. Clears the variables first."""
+        config.command_interpretter = self
+
+        import utilities
+        utilities.options._command_interpretter = self
+
         self.math_objects.clear()
         self._globals.clear()
         self._canvas.delete(tk.ALL)
         self.draw_grid()
+
         self.execute_commands_immediate(text)
 
     def execute_commands_immediate(self, text):

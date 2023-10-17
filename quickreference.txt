@@ -9,6 +9,7 @@ polygon = Polygon([(0,0), (1,1), (2,2)])    # list of points
 rectangle = Polygon.rectangle(0,0,5,5)      # (x,y,width,height)
 square = Polygon.square(0,0,1)              # (x,y,sides)
 triangle = Polygon.triangle(0,0,3,3)        # (x,y,width,height)
+circle = Polygon.circle(0,0,5)              # (x,y,radius)
 
 # 2d linear transformation matrix:
 # [a b]
@@ -62,6 +63,9 @@ obj2 = obj.copy()       # copy object
 # do something every frame (dt is time since last frame)
 def on_update(dt):
     v.angle += dt * 5 # rotate vector v 5 degrees per second
+
+# options
+options.grid = False     # hide/show grid
 
 # print stuff to console
 print(stuff) # stuff can be any object or literal

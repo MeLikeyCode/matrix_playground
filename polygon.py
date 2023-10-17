@@ -2,6 +2,7 @@ from mathobject import MathObject
 import config
 from config import LABEL_FONT
 from vector import Vector
+import math
 
 class Polygon(MathObject):
     """A polygon."""
@@ -13,6 +14,20 @@ class Polygon(MathObject):
     @staticmethod
     def square(x,y,s):
         return Polygon.rectangle(x,y,s,s)
+    
+    @staticmethod
+    def circle(x,y,r):
+        # circumference = 2 * math.pi * r
+        # K = 10
+        # num_segments =  int(circumference / K)
+        num_segments = 100
+        points = []
+        for i in range(num_segments):
+            angle = i / num_segments * (2 * math.pi)
+            px = r * math.cos(angle) + x
+            py = r * math.sin(angle) + y
+            points.append((px,py))
+        return Polygon(points)
 
     @staticmethod
     def triangle(x,y,w,h):
@@ -22,13 +37,15 @@ class Polygon(MathObject):
         super().__init__()
         self._points = points
         self._label = label
-        self._points_transformed = [config.command_interpretter.initial_transform * Vector(p[0], p[1]) for p in points]
+        self._points_transformed = [config.command_interpretter.initial_transform * Vector(p[0], p[1]) for p in self._points]
 
     def copy(self):
         return Polygon(self._points)
 
     def draw(self):
         super().draw()
+
+        self._points_transformed = [config.command_interpretter.initial_transform * Vector(p[0], p[1]) for p in self._points]
         
         xys = [p for pt in self._points_transformed for p in pt]
         p = self._canvas.create_polygon(

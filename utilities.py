@@ -28,3 +28,21 @@ def clear(*objects):
     """Clears the given MathObjects from the canvas."""
     for obj in objects:
         obj.clear()
+
+class _Options:
+    def __init__(self):
+        import config
+        self._command_interpretter = config.command_interpretter
+
+        self._grid_visible = True
+
+    @property
+    def grid(self):
+        return self._grid_visible
+    
+    @grid.setter
+    def grid(self, value):
+        self._grid_visible = value
+        self._command_interpretter.show_grid = value
+
+options = _Options()

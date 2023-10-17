@@ -1,17 +1,17 @@
 # Matrix Playground
 
-Interactively play with/visualize matrices, vectors, points, transformations, etc.
+Interactively play with/visualize matrices, vectors, transformations, points, polygons, circles, etc. Can run a function periodically to animate things.
 
 ![](parametric_curve.gif)
 
-If you just wanna use it, go to the [releases](https://github.com/MeLikeyCode/matrix_playground/releases) and download the installer, you don't need to read the rest of this document.
+If you just wanna use it, go to the [releases](https://github.com/MeLikeyCode/matrix_playground/releases) and download the installer. Once installed/launched, read the quick-reference/examples pane on the right of the application's window to learn how to use it.
 
-If you wanna edit/build it, read on.
+You don't need to read the rest of *this* document unless you want to develop/build the application itself.
 
 # Dependencies
-- python 3 (including tkinter)
+- python 3
 - numpy
-- jedi
+- jedi (used for autocomplete)
 
 # Architecture
 The functionality is split into a bunch of classes. Generally 1 class per file (file has same name as class).
@@ -22,6 +22,7 @@ The functionality is split into a bunch of classes. Generally 1 class per file (
 - `QuickReference` is a widget that displays the quick reference
 - `Examples` is a widget that displays example code
 - `config.py` doesn't have a class, but contains program-wide (not just module-wide) globals
+- `utilities.py` doesn't have a class, but contains utility functions that the *end-user* can use (e.g. `random_color()`)
 - `Gui` represents the GUI as a whole (the code editor and the command interpretter)
 - `MathObject` is the base class of all things you can create (Vectors, Points, Polygons, matrices, etc)
 - `Vector` - a 2d vector
@@ -37,4 +38,4 @@ The functionality is split into a bunch of classes. Generally 1 class per file (
   - This script uses pyinstaller first to create a standalone folder, then makes an installer from that folder using NSIS. The installer is called `install_matrix_playground.exe` and is place at the root of the project folder.
 
 # Acknowledgements
-Thanks to python, jedi (python smart autocomplete library), NSIS, and vscode for making developing this easy.
+Thanks to python, jedi (python smart autocomplete library), and NSIS for making creating this easy(ish).
